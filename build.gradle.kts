@@ -24,17 +24,27 @@ repositories {
 }
 
 dependencies {
-    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
-    compile("io.ktor:ktor-server-netty:$ktor_version")
-    compile("ch.qos.logback:logback-classic:$logback_version")
-    compile("io.ktor:ktor-server-core:$ktor_version")
-    compile("io.ktor:ktor-html-builder:$ktor_version")
-    compile("io.ktor:ktor-server-host-common:$ktor_version")
-    compile("io.ktor:ktor-jackson:$ktor_version")
-    compile("io.ktor:ktor-client-core:$ktor_version")
-    compile("io.ktor:ktor-client-core-jvm:$ktor_version")
-    compile("io.ktor:ktor-client-apache:$ktor_version")
-    testCompile("io.ktor:ktor-server-tests:$ktor_version")
+
+    // Kotlin standard library
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
+
+    // Ktor server
+    implementation("io.ktor:ktor-server-core:$ktor_version")
+    implementation("io.ktor:ktor-server-netty:$ktor_version")
+    implementation("io.ktor:ktor-server-host-common:$ktor_version")
+
+    // JSON Serialization
+    implementation("io.ktor:ktor-jackson:$ktor_version")
+
+    // Logging
+    implementation("ch.qos.logback:logback-classic:$logback_version")
+
+    // Ktor client
+    implementation("io.ktor:ktor-client-core:$ktor_version")
+    implementation("io.ktor:ktor-client-core-jvm:$ktor_version")
+    implementation("io.ktor:ktor-client-apache:$ktor_version")
+
+    testImplementation("io.ktor:ktor-server-tests:$ktor_version")
 }
 
 kotlin.sourceSets["main"].kotlin.srcDirs("src")
