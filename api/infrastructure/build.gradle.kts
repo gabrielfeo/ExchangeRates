@@ -21,10 +21,19 @@ dependencies {
     // JSON Serialization
     implementation("io.ktor:ktor-jackson:$ktor_version")
 
+    // Joda Money
+    implementation("org.joda:joda-money:1.0.1")
+
     // Ktor client
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-core-jvm:$ktor_version")
     implementation("io.ktor:ktor-client-apache:$ktor_version")
 
+    // Unit testing
+    testImplementation("org.junit.jupiter:junit-jupiter:5.4.2")
     testImplementation("io.ktor:ktor-client-logging:$ktor_version")
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
