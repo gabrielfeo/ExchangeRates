@@ -1,6 +1,6 @@
-rootProject.name = "exchangerates"
 include(
     ":domain",
     ":api",
+    ":api:application",
     ":frontend"
 )

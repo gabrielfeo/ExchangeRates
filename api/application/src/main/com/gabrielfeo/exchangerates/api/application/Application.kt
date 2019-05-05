@@ -1,6 +1,6 @@
 @file:Suppress("MoveLambdaOutsideParentheses")
 
-package com.gabrielfeo.exchangerates.api
+package com.gabrielfeo.exchangerates.api.application
 
 import io.ktor.application.Application
 import io.ktor.application.call
