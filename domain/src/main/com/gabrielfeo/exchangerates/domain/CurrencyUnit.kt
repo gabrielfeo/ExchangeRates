@@ -1,7 +1,5 @@
 package com.gabrielfeo.exchangerates.domain
 
-import java.math.BigDecimal
-
 /**
  * Representation of a currency unit of account.
  *
@@ -17,17 +15,6 @@ data class CurrencyUnit(
     val code: String,
     val numericCode: Int
 ) : UnitOfAccount {
-
-    val exchangeRate = ExchangeRate(this)
-
-    override fun valueIn(other: UnitOfAccount): BigDecimal {
-        if (other is CurrencyUnit) return this.exchangeRate.toCurrency(other)
-        else throw UnsupportedOperationException("Converting a currency to a non-currency unit of account is not supported.")
-    }
-
-    override fun compareTo(other: UnitOfAccount): Int {
-        return this.valueIn(other).compareTo(BigDecimal.ZERO)
-    }
 
     override fun equals(other: Any?): Boolean {
         return if (other is CurrencyUnit) this.numericCode == other.numericCode

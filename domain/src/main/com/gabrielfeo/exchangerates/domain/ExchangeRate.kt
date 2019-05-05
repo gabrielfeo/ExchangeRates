@@ -7,15 +7,15 @@ import java.math.BigDecimal
  *
  * @property fixedCurrency the base `CurrencyUnit` for this exchange rate.
  */
-data class ExchangeRate(val fixedCurrency: CurrencyUnit) {
+data class ExchangeRate(
+    val fixedCurrency: CurrencyUnit,
+    val variableCurrency: CurrencyUnit,
+    val value: BigDecimal
+) : Comparable<ExchangeRate> {
 
-    /**
-     * Converts the value of 1.00 [fixedCurrency] to another `CurrencyUnit`.
-     * @param other the `CurrencyUnit` that [fixedCurrency] should be converted to
-     * @return the equivalent value of 1.00 [fixedCurrency] in [other]
-     */
-    fun toCurrency(other: CurrencyUnit): BigDecimal {
-        TODO()
+    override fun compareTo(other: ExchangeRate): Int {
+        return if (this.fixedCurrency == other.fixedCurrency) this.value.compareTo(other.value)
+        else throw IllegalArgumentException("Two exchange rates with different fixed currencies can't be compared.")
     }
 
 }
