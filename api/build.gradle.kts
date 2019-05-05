@@ -20,6 +20,12 @@ repositories {
     maven { url = uri("https://kotlin.bintray.com/ktor") }
 }
 
+kotlin.sourceSets["main"].kotlin.srcDirs("src/main")
+sourceSets["main"].resources.srcDirs("res/main")
+
+kotlin.sourceSets["test"].kotlin.srcDirs("src/test")
+sourceSets["test"].resources.srcDirs("res/test")
+
 dependencies {
 
     // Kotlin standard library
@@ -43,10 +49,3 @@ dependencies {
 
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
 }
-
-kotlin.sourceSets["main"].kotlin.srcDirs("src")
-sourceSets["main"].resources.srcDirs("resources")
-
-kotlin.sourceSets["test"].kotlin.srcDirs("test")
-sourceSets["test"].resources.srcDirs("testresources")
-
