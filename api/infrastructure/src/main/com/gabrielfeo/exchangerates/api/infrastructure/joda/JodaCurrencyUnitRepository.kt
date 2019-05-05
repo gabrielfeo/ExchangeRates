@@ -1,4 +1,4 @@
-package com.gabrielfeo.exchangerates.api.infrastructure
+package com.gabrielfeo.exchangerates.api.infrastructure.joda
 
 import com.gabrielfeo.exchangerates.domain.currency.CurrencyUnit
 import com.gabrielfeo.exchangerates.domain.currency.CurrencyUnitRepository

@@ -1,13 +1,14 @@
 package com.gabrielfeo.exchangerates.api.infrastructure.tests
 
-import com.gabrielfeo.exchangerates.api.infrastructure.JodaCurrencyUnitRepository
+import com.gabrielfeo.exchangerates.api.infrastructure.joda.JodaCurrencyUnitRepository
 import com.gabrielfeo.exchangerates.domain.currency.CurrencyUnitRepository
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class JodaCurrencyUnitRepositoryTest {
 
-    private val currencyUnitRepository: CurrencyUnitRepository = JodaCurrencyUnitRepository()
+    private val currencyUnitRepository: CurrencyUnitRepository =
+        JodaCurrencyUnitRepository()
 
     @Test
     fun `Repository contains circulating currencies`() {

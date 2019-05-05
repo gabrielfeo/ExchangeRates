@@ -1,7 +1,7 @@
-package com.gabrielfeo.exchangerates.api.infrastructure
+package com.gabrielfeo.exchangerates.api.infrastructure.currencylayer
 
-import com.gabrielfeo.exchangerates.api.infrastructure.dto.ErrorDto
-import com.gabrielfeo.exchangerates.api.infrastructure.dto.LiveRatesDto
+import com.gabrielfeo.exchangerates.api.infrastructure.currencylayer.dto.ErrorDto
+import com.gabrielfeo.exchangerates.api.infrastructure.currencylayer.dto.LiveRatesDto
 import com.gabrielfeo.exchangerates.domain.currency.CurrencyUnit
 import java.time.LocalDate
 

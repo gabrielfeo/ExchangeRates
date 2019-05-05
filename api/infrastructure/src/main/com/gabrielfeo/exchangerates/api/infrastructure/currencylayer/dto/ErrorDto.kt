@@ -1,4 +1,4 @@
-package com.gabrielfeo.exchangerates.api.infrastructure.dto
+package com.gabrielfeo.exchangerates.api.infrastructure.currencylayer.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
