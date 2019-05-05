@@ -19,4 +19,13 @@ data class ExchangeRate(
         else throw IllegalArgumentException("Two exchange rates with different fixed currencies can't be compared.")
     }
 
+    override fun equals(other: Any?): Boolean {
+        return if (other is ExchangeRate) this.value == other.value
+        else false
+    }
+
+    override fun hashCode(): Int {
+        return this.value.hashCode()
+    }
+
 }
