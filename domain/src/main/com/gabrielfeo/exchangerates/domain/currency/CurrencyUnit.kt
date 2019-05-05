@@ -1,4 +1,6 @@
-package com.gabrielfeo.exchangerates.domain
+package com.gabrielfeo.exchangerates.domain.currency
+
+import com.gabrielfeo.exchangerates.domain.UnitOfAccount
 
 /**
  * Representation of a currency unit of account.

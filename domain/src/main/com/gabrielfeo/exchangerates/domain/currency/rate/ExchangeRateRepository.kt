@@ -1,4 +1,6 @@
-package com.gabrielfeo.exchangerates.domain
+package com.gabrielfeo.exchangerates.domain.currency.rate
+
+import com.gabrielfeo.exchangerates.domain.currency.CurrencyUnit
 
 /**
  * A repository where current exchange rates can be retrieved
