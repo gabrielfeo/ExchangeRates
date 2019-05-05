@@ -1,2 +1,5 @@
 rootProject.name = "exchangerates"
-include(":api")
+include(
+    ":api",
+    ":frontend"
+)
