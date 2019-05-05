@@ -1,6 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.Coroutines
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 val ktor_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
@@ -48,7 +45,8 @@ dependencies {
 }
 
 kotlin.sourceSets["main"].kotlin.srcDirs("src")
-kotlin.sourceSets["test"].kotlin.srcDirs("test")
-
 sourceSets["main"].resources.srcDirs("resources")
+
+kotlin.sourceSets["test"].kotlin.srcDirs("test")
 sourceSets["test"].resources.srcDirs("testresources")
+
