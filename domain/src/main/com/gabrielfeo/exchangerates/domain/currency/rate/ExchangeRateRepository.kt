@@ -14,6 +14,6 @@ interface ExchangeRateRepository {
      * @param variableCurrency the `CurrencyUnit` of the resulting `ExchangeRate` value
      * @return the `ExchangeRate` of 1.00 [fixedCurrency] in [variableCurrency]
      */
-    fun getRate(fixedCurrency: CurrencyUnit, variableCurrency: CurrencyUnit): ExchangeRate
+    suspend fun getRate(fixedCurrency: CurrencyUnit, variableCurrency: CurrencyUnit): ExchangeRate
 
 }
