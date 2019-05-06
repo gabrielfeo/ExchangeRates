@@ -5,11 +5,13 @@ package com.gabrielfeo.exchangerates.api.infrastructure.currencylayer
 import com.gabrielfeo.exchangerates.api.infrastructure.currencylayer.dto.HistoricalRatesDto
 import com.gabrielfeo.exchangerates.api.infrastructure.currencylayer.dto.LiveRatesDto
 import com.gabrielfeo.exchangerates.api.infrastructure.currencylayer.exception.ApiException
+import com.gabrielfeo.exchangerates.api.infrastructure.currencylayer.http.QueryParameterInjector
 import com.gabrielfeo.exchangerates.domain.currency.CurrencyUnit
 import com.gabrielfeo.exchangerates.domain.currency.CurrencyUnitRepository
 import com.gabrielfeo.exchangerates.domain.currency.rate.ExchangeRate
 import io.ktor.client.HttpClient
 import io.ktor.client.call.typeInfo
+import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.features.json.JacksonSerializer
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.JsonSerializer
@@ -24,20 +26,24 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 internal class CurrencyLayerApiAgent(
+    private val apiKey: String,
     private val currencyRepository: CurrencyUnitRepository
 ) : CurrencyLayerApi {
 
     private val serializer: JsonSerializer by lazy { JacksonSerializer() }
     private val client: HttpClient by lazy {
-        HttpClient {
+        HttpClient(OkHttp) {
             install(JsonFeature) {
                 serializer = this@CurrencyLayerApiAgent.serializer
+            }
+            engine {
+                addInterceptor(QueryParameterInjector("access_key", apiKey))
             }
         }
     }
 
     internal companion object {
-        const val baseApiUrl = "https://apilayer.net/api"
+        const val baseApiUrl = "http://apilayer.net/api"
         const val liveRatesUrl = "$baseApiUrl/live"
         const val historicalRatesUrl = "$baseApiUrl/historical"
     }

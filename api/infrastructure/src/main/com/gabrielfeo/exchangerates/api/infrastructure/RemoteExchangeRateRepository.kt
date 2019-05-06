@@ -8,9 +8,9 @@ import com.gabrielfeo.exchangerates.domain.currency.CurrencyUnit
 import com.gabrielfeo.exchangerates.domain.currency.rate.ExchangeRate
 import com.gabrielfeo.exchangerates.domain.currency.rate.ExchangeRateRepository
 
-class RemoteExchangeRateRepository : ExchangeRateRepository {
+class RemoteExchangeRateRepository(currencyLayerApiKey: String) : ExchangeRateRepository {
 
-    private val remote: CurrencyLayerApi = CurrencyLayerApiAgent(currencyRepository = JodaCurrencyUnitRepository())
+    private val remote: CurrencyLayerApi = CurrencyLayerApiAgent(currencyLayerApiKey, currencyRepository = JodaCurrencyUnitRepository())
 
     override suspend fun getRate(fixedCurrency: CurrencyUnit, variableCurrency: CurrencyUnit): ExchangeRate {
         try {
