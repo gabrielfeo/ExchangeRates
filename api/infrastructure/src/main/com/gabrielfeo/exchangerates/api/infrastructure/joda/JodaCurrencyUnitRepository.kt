@@ -14,4 +14,8 @@ class JodaCurrencyUnitRepository : CurrencyUnitRepository {
             }
     }
 
+    override fun get(currencyCode: String): CurrencyUnit? {
+        return currencies.firstOrNull { it.code == currencyCode }
+    }
+
 }

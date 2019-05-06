@@ -10,4 +10,10 @@ interface CurrencyUnitRepository {
      */
     val currencies: Collection<CurrencyUnit>
 
+    /**
+     * Gets a currency by [CurrencyUnit.code].
+     * @return the `CurrencyUnit` of the given [currencyCode], or null if it's not a circulating currency.
+     */
+    operator fun get(currencyCode: String): CurrencyUnit?
+
 }
