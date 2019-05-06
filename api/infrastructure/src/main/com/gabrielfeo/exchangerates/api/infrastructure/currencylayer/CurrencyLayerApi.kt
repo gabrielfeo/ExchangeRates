@@ -8,13 +8,13 @@ internal interface CurrencyLayerApi {
 
     suspend fun getLiveRates(
         fixedCurrency: CurrencyUnit,
-        rates: Collection<CurrencyUnit>
+        vairableCurrencies: Collection<CurrencyUnit>
     ): Collection<ExchangeRate>
 
     suspend fun getHistoricalRates(
         date: LocalDate,
         fixedCurrency: CurrencyUnit,
-        rates: Collection<CurrencyUnit>
+        variableCurrencies: Collection<CurrencyUnit>
     ): Collection<ExchangeRate>
 
 }

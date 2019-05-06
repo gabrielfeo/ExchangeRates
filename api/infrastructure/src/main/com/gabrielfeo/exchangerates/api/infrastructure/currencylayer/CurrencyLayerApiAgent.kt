@@ -55,33 +55,33 @@ internal class CurrencyLayerApiAgent(
 
     override suspend fun getLiveRates(
         fixedCurrency: CurrencyUnit,
-        rates: Collection<CurrencyUnit>
+        vairableCurrencies: Collection<CurrencyUnit>
     ): Collection<ExchangeRate> {
         try {
             val dto = client.request<LiveRatesDto>(liveRatesUrl) {
                 parameter("source", fixedCurrency.code)
-                parameter("currencies", rates.map { rate -> rate.code }.joinToString(","))
+                parameter("currencies", vairableCurrencies.map { rate -> rate.code }.joinToString(","))
             }
             return dto.mappedToDomainModel()
         } catch (error: Throwable) {
-            throw ApiException("Failed to get live rates for ${fixedCurrency.code}.", cause = error)
+            throw ApiException("Failed to get live vairableCurrencies for ${fixedCurrency.code}.", cause = error)
         }
     }
 
     override suspend fun getHistoricalRates(
         date: LocalDate,
         fixedCurrency: CurrencyUnit,
-        rates: Collection<CurrencyUnit>
+        variableCurrencies: Collection<CurrencyUnit>
     ): Collection<ExchangeRate> {
         try {
             val dto = client.request<HistoricalRatesDto>(historicalRatesUrl) {
                 parameter("date", date.toString())
                 parameter("source", fixedCurrency.code)
-                parameter("currencies", rates.joinToString(",") { rate -> rate.code })
+                parameter("currencies", variableCurrencies.joinToString(",") { rate -> rate.code })
             }
             return dto.mappedToDomainModel()
         } catch (error: Throwable) {
-            throw ApiException("Failed to get live rates for ${fixedCurrency.code}.", cause = error)
+            throw ApiException("Failed to get live variableCurrencies for ${fixedCurrency.code}.", cause = error)
         }
     }
 
