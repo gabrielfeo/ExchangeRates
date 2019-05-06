@@ -7,6 +7,7 @@ import com.gabrielfeo.exchangerates.api.infrastructure.joda.JodaCurrencyUnitRepo
 import com.gabrielfeo.exchangerates.domain.currency.CurrencyUnit
 import com.gabrielfeo.exchangerates.domain.currency.rate.ExchangeRate
 import com.gabrielfeo.exchangerates.domain.currency.rate.ExchangeRateRepository
+import java.time.OffsetDateTime
 
 // TODO Create domain exceptions
 
@@ -28,6 +29,18 @@ class RemoteExchangeRateRepository(currencyLayerApiKey: String) : ExchangeRateRe
     ): Collection<ExchangeRate> {
         try {
             return remote.getLiveRates(fixedCurrency, variableCurrencies)
+        } catch (exception: ApiException) {
+            throw RuntimeException(exception)
+        }
+    }
+
+    override suspend fun getRatesAt(
+        time: OffsetDateTime,
+        fixedCurrency: CurrencyUnit,
+        variableCurrencies: Collection<CurrencyUnit>
+    ): Collection<ExchangeRate> {
+        try {
+            return remote.getHistoricalRates(time.toLocalDate(), fixedCurrency, variableCurrencies)
         } catch (exception: ApiException) {
             throw RuntimeException(exception)
         }
