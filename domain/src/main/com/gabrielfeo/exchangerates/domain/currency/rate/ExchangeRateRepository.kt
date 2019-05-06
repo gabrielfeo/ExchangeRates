@@ -16,4 +16,16 @@ interface ExchangeRateRepository {
      */
     suspend fun getRate(fixedCurrency: CurrencyUnit, variableCurrency: CurrencyUnit): ExchangeRate
 
+    /**
+     * Gets the current value of 1.00 [fixedCurrency] in each of the given `CurrencyUnit`s, [variableCurrencies].
+     *
+     * @param fixedCurrency the base `CurrencyUnit`
+     * @param variableCurrencies the `CurrencyUnit`s [fixedCurrency] should be converted to
+     * @return `ExchangeRate`s of 1.00 [fixedCurrency] converted to each of the [variableCurrencies]
+     */
+    suspend fun getRates(
+        fixedCurrency: CurrencyUnit,
+        variableCurrencies: Collection<CurrencyUnit>
+    ): Collection<ExchangeRate>
+
 }
