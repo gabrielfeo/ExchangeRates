@@ -1,6 +1,7 @@
 package com.gabrielfeo.exchangerates.api.infrastructure.currencylayer.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.gabrielfeo.exchangerates.api.infrastructure.currencylayer.exception.ApiException
 
 internal class ErrorDto {
 
@@ -8,6 +9,10 @@ internal class ErrorDto {
         private set
     var info: String = ""
         private set
+
+    fun toException(): ApiException =
+        if (code != -1 && info.isNotEmpty()) ApiException(code, info)
+        else ApiException.unknown
 
     @JsonProperty("error")
     private fun unpackErrorObjectMembers(json: Map<String, Any>) {

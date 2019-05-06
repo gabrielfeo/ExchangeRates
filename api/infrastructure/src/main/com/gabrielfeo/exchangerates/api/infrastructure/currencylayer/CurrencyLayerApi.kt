@@ -1,19 +1,20 @@
 package com.gabrielfeo.exchangerates.api.infrastructure.currencylayer
 
-import com.gabrielfeo.exchangerates.api.infrastructure.currencylayer.dto.RatesDto
 import com.gabrielfeo.exchangerates.domain.currency.CurrencyUnit
+import com.gabrielfeo.exchangerates.domain.currency.rate.ExchangeRate
 import java.time.LocalDate
 
 internal interface CurrencyLayerApi {
 
     suspend fun getLiveRates(
-        fixedCurrency: CurrencyUnit, rates: Collection<CurrencyUnit>,
-        onResponse: (RatesDto) -> Unit
-    )
+        fixedCurrency: CurrencyUnit,
+        rates: Collection<CurrencyUnit>
+    ): Collection<ExchangeRate>
 
     suspend fun getHistoricalRates(
-        date: LocalDate, fixedCurrency: CurrencyUnit, rates: Collection<CurrencyUnit>,
-        onResponse: (RatesDto) -> Unit
-    )
+        date: LocalDate,
+        fixedCurrency: CurrencyUnit,
+        rates: Collection<CurrencyUnit>
+    ): Collection<ExchangeRate>
 
 }

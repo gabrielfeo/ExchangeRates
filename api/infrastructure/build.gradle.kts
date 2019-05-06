@@ -28,6 +28,7 @@ dependencies {
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-core-jvm:$ktor_version")
     implementation("io.ktor:ktor-client-apache:$ktor_version")
+    implementation("io.ktor:ktor-client-jackson:$ktor_version")
 
     // Unit testing
     testImplementation("org.junit.jupiter:junit-jupiter:5.4.2")
