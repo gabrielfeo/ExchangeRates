@@ -2,6 +2,7 @@
 
 package com.gabrielfeo.exchangerates.api.infrastructure.currencylayer
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.gabrielfeo.exchangerates.api.infrastructure.currencylayer.dto.HistoricalRatesDto
 import com.gabrielfeo.exchangerates.api.infrastructure.currencylayer.dto.LiveRatesDto
 import com.gabrielfeo.exchangerates.api.infrastructure.currencylayer.exception.ApiException
@@ -30,7 +31,11 @@ internal class CurrencyLayerApiAgent(
     private val currencyRepository: CurrencyUnitRepository
 ) : CurrencyLayerApi {
 
-    private val serializer: JsonSerializer by lazy { JacksonSerializer() }
+    private val serializer: JsonSerializer by lazy {
+        JacksonSerializer {
+            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        }
+    }
     private val client: HttpClient by lazy {
         HttpClient(OkHttp) {
             install(JsonFeature) {
@@ -56,7 +61,7 @@ internal class CurrencyLayerApiAgent(
         try {
             val dto = client.request<LiveRatesDto>(liveRatesUrl) {
                 parameter("source", fixedCurrency.code)
-                parametersOf("currencies", rates.map { rate -> rate.code })
+                parameter("currencies", rates.map { rate -> rate.code }.joinToString(","))
             }
             return dto.mappedToDomainModel()
         } catch (error: Throwable) {
@@ -84,7 +89,7 @@ internal class CurrencyLayerApiAgent(
 
     private fun LiveRatesDto.mappedToDomainModel(): Collection<ExchangeRate> {
         return quotes.map { (currenciesString, value) ->
-            val time = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.of("UTC"))
+            val time = LocalDateTime.ofInstant(Instant.ofEpochSecond(timestamp), ZoneId.of("UTC"))
             parseCurrencies(currenciesString)?.let { (fixedCurrency, variableCurrency) ->
                 ExchangeRate(fixedCurrency, variableCurrency, value.toBigDecimal(), time)
             }
