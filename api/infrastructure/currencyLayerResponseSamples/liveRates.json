@@ -1,0 +1,14 @@
+{
+  "success": true,
+  "terms": "https:\/\/currencylayer.com\/terms",
+  "privacy": "https:\/\/currencylayer.com\/privacy",
+  "timestamp": 1557076445,
+  "source": "USD",
+  "quotes": {
+    "USDUSD": 1,
+    "USDAUD": 1.424298,
+    "USDCAD": 1.34375,
+    "USDPLN": 3.817398,
+    "USDMXN": 18.919103
+  }
+}
