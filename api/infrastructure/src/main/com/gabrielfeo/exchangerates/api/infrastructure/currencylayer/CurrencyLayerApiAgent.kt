@@ -19,7 +19,6 @@ import io.ktor.client.features.json.JsonSerializer
 import io.ktor.client.request.parameter
 import io.ktor.client.request.request
 import io.ktor.client.response.HttpResponse
-import io.ktor.http.parametersOf
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -78,7 +77,7 @@ internal class CurrencyLayerApiAgent(
             val dto = client.request<HistoricalRatesDto>(historicalRatesUrl) {
                 parameter("date", date.toString())
                 parameter("source", fixedCurrency.code)
-                parametersOf("currencies", rates.map { rate -> rate.code })
+                parameter("currencies", rates.joinToString(",") { rate -> rate.code })
             }
             return dto.mappedToDomainModel()
         } catch (error: Throwable) {
@@ -98,7 +97,7 @@ internal class CurrencyLayerApiAgent(
 
     private fun HistoricalRatesDto.mappedToDomainModel(): Collection<ExchangeRate> {
         return quotes.map { (currenciesString, value) ->
-            val time = LocalDateTime.parse(date, DateTimeFormatter.ISO_DATE)
+            val time = LocalDate.parse(date, DateTimeFormatter.ISO_DATE).atTime(0, 0)
             parseCurrencies(currenciesString)?.let { (fixedCurrency, variableCurrency) ->
                 ExchangeRate(fixedCurrency, variableCurrency, value.toBigDecimal(), time)
             }

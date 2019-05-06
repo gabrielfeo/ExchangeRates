@@ -7,6 +7,7 @@ import com.gabrielfeo.exchangerates.domain.currency.CurrencyUnitRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 class CurrencyLayerApiAgentTest {
@@ -25,6 +26,17 @@ class CurrencyLayerApiAgentTest {
         assertTrue(rates.all { rate -> rate.fixedCurrency == usd })
         assertTrue(rates.all { rate -> rate.variableCurrency == brl })
         assertTrue(rates.all { rate -> rate.time.isAfter(LocalDateTime.now().withYear(2000)) })
+    }
+
+    @Test
+    fun `Historical rates endpoint`() {
+        val usd = currencyRepository["USD"]!!
+        val brl = currencyRepository["BRL"]!!
+        val date = LocalDate.of(2017, 8, 8)
+        val rates = runBlocking { agent.getHistoricalRates(date, usd, listOf(brl)) }
+        assertTrue(rates.all { rate -> rate.fixedCurrency == usd })
+        assertTrue(rates.all { rate -> rate.variableCurrency == brl })
+        assertTrue(rates.all { rate -> rate.time.toLocalDate() == date })
     }
 
 }
