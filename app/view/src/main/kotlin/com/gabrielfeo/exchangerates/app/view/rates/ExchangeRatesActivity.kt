@@ -5,6 +5,7 @@ package com.gabrielfeo.exchangerates.app.view.rates
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.get
 import com.gabrielfeo.exchangerates.app.view.R
@@ -19,6 +20,11 @@ class ExchangeRatesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get<ExchangeRatesViewModel>()
         binding = DataBindingUtil.setContentView(this, R.layout.exchange_rates_activity)
+        observeViewModelData()
+    }
+
+    private fun observeViewModelData() {
+        viewModel.availableFixedCurrencies.observe(this, Observer { rate -> binding.placeholder.text = rate.first() })
     }
 
 }
