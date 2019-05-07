@@ -1,8 +1,10 @@
+@file:Suppress("RemoveExplicitTypeArguments")
+
 package com.gabrielfeo.exchangerates.app.view.rates
 
-import android.databinding.DataBindingUtil
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.get
 import com.gabrielfeo.exchangerates.app.view.R

@@ -6,12 +6,12 @@ plugins {
 
 android {
 
-    compileSdkVersion(28)
+    compileSdkVersion(parent!!.extra["compileSdkVersion"]!! as Int)
 
     defaultConfig {
         applicationId = "com.gabrielfeo.exchangerates.app.view"
-        minSdkVersion(28)
-        targetSdkVersion(28)
+        minSdkVersion(parent!!.extra["minSdkVersion"]!! as Int)
+        targetSdkVersion(parent!!.extra["targetSdkVersion"]!! as Int)
         versionCode = 1
         versionName = "0.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -41,6 +41,10 @@ android {
 
 
 dependencies {
+    implementation(project(":app:infrastructure")) {
+        exclude(group = "org.threeten", module = "threetenbp")
+    }
+
     implementation(kotlin("reflect", "1.3.30"))
 
     implementation("com.jakewharton.threetenabp:threetenabp:1.2.0")
@@ -60,6 +64,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.0.2")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
 
+    kapt("androidx.databinding:databinding-runtime:3.4.0")
 
     implementation("com.google.android.material:material:1.0.0")
 
@@ -67,9 +72,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime:$lifecycleComponentsVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleComponentsVersion")
     implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleComponentsVersion")
-//    kapt("androidx.lifecycle:lifecycle-compiler:$lifecycleComponentsVersion")
-
-//    kapt("com.android.databinding:compiler:3.1.4")
+    kapt("androidx.lifecycle:lifecycle-compiler:$lifecycleComponentsVersion")
 
     testImplementation("androidx.test:runner:1.1.1")
     testImplementation("androidx.test.espresso:espresso-core:3.1.1")
