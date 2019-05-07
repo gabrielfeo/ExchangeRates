@@ -51,7 +51,6 @@ dependencies {
 
     val retrofitVersion = "2.5.0"
     implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
-    implementation("com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion")
     implementation("com.squareup.retrofit2:converter-jackson:$retrofitVersion")
 
     val koinVersion = "1.0.2"
@@ -63,8 +62,6 @@ dependencies {
     implementation("androidx.core:core-ktx:1.0.1")
     implementation("androidx.appcompat:appcompat:1.0.2")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
-
-    kapt("androidx.databinding:databinding-runtime:3.4.0")
 
     implementation("com.google.android.material:material:1.0.0")
 
