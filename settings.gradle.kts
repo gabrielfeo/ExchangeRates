@@ -1,7 +1,11 @@
 include(
     ":domain",
+
     ":api",
     ":api:application",
     ":api:infrastructure",
-    ":frontend"
+
+    ":frontend",
+    ":app",
+    ":app:view"
 )
