@@ -7,5 +7,6 @@ include(
 
     ":frontend",
     ":app",
-    ":app:view"
+    ":app:view",
+    ":app:infrastructure"
 )
