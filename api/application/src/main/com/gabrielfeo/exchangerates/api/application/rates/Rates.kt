@@ -2,6 +2,7 @@
 
 package com.gabrielfeo.exchangerates.api.application.rates
 
+import com.gabrielfeo.exchangerates.api.application.rates.model.RatesResponse
 import com.gabrielfeo.exchangerates.api.infrastructure.RemoteExchangeRateRepository
 import com.gabrielfeo.exchangerates.api.infrastructure.joda.JodaCurrencyUnitRepository
 import com.gabrielfeo.exchangerates.domain.currency.CurrencyUnit
@@ -42,23 +43,24 @@ fun Application.rates(testing: Boolean = false) {
 
             get("current") {
                 val parameters = call.request.queryParameters
-                val (fixedCurrency, variableCurrencies) = parseCurrenciesFromQuery(
-                    parameters,
-                    currencyUnitRepository
-                )
+                val (fixedCurrency, variableCurrencies) = parseCurrenciesFromQuery(parameters, currencyUnitRepository)
+
                 val rates = exchangeRateRepository.getRates(fixedCurrency, variableCurrencies)
-                call.respond(HttpStatusCode.OK, rates) // TODO Define output JSON model
+                val response = RatesResponse(fixedCurrency.code, rates.first().time.toString(), rates)
+                call.respond(HttpStatusCode.OK, response)
             }
 
             get("past") {
                 val parameters = call.request.queryParameters
+                val time = parseTimeFromQuery(parameters)
                 val (fixedCurrency, variableCurrencies) = parseCurrenciesFromQuery(
                     parameters,
                     currencyUnitRepository
                 )
-                val time = parseTimeFromQuery(parameters)
+
                 val rates = exchangeRateRepository.getRatesAt(time, fixedCurrency, variableCurrencies)
-                call.respond(HttpStatusCode.OK, rates)
+                val response = RatesResponse(fixedCurrency.code, rates.first().time.toString(), rates)
+                call.respond(HttpStatusCode.OK, response)
             }
 
         }
