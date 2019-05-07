@@ -13,6 +13,8 @@ dependencies {
 
     api("org.threeten:threetenbp:1.3.8")
 
+    implementation("org.joda:joda-money:1.0.1")
+
     val retrofitVersion = "2.5.0"
     implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
     implementation("com.squareup.retrofit2:converter-jackson:$retrofitVersion")
