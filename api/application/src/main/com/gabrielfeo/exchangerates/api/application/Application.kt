@@ -17,12 +17,10 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.Parameters
 import io.ktor.jackson.jackson
 import io.ktor.response.respond
-import io.ktor.response.respondRedirect
 import io.ktor.routing.get
 import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.util.KtorExperimentalAPI
-import io.ktor.util.url
 import java.time.LocalDate
 import java.time.OffsetDateTime
 
@@ -59,11 +57,6 @@ fun Application.rates(testing: Boolean = false) {
                 val time = parseTimeFromQuery(parameters)
                 val rates = exchangeRateRepository.getRatesAt(time, fixedCurrency, variableCurrencies)
                 call.respond(HttpStatusCode.OK, rates)
-            }
-
-            get("/") {
-                val currentRatesRoute = url { path("current") }
-                call.respondRedirect(currentRatesRoute, permanent = true)
             }
 
         }
