@@ -1,6 +1,6 @@
 package com.gabrielfeo.exchangerates.api.application.tests
 
-import com.gabrielfeo.exchangerates.api.application.rates
+import com.gabrielfeo.exchangerates.api.application.rates.rates
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.handleRequest
