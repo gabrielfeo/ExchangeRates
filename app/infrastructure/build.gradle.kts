@@ -5,11 +5,16 @@ plugins {
 kotlin.sourceSets["main"].kotlin.srcDirs("src/main")
 kotlin.sourceSets["test"].kotlin.srcDirs("src/test")
 
+configure<JavaPluginConvention> {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 dependencies {
     api(project(":domain"))
 
     implementation(kotlin("reflect", "1.3.30"))
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.1")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.2.1")
 
     implementation("org.joda:joda-money:1.0.1")
 
