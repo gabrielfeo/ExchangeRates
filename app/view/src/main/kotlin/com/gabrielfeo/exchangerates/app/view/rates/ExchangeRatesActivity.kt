@@ -3,6 +3,8 @@
 package com.gabrielfeo.exchangerates.app.view.rates
 
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -11,6 +13,9 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.get
 import com.gabrielfeo.exchangerates.app.view.R
 import com.gabrielfeo.exchangerates.app.view.databinding.ExchangeRatesActivityBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ExchangeRatesActivity : AppCompatActivity() {
 
@@ -24,6 +29,7 @@ class ExchangeRatesActivity : AppCompatActivity() {
         setupFixedCurrencySelector()
         setupVariableCurrencySelector()
         setupExchangeRateChart()
+        observeNewCurrenciesSelection()
     }
 
     private fun setupFixedCurrencySelector() {
@@ -53,6 +59,33 @@ class ExchangeRatesActivity : AppCompatActivity() {
     private fun setupExchangeRateChart() {
         viewModel.exchangeRate.observe(this, Observer { rate ->
         })
+    }
+
+    private fun observeNewCurrenciesSelection() {
+        binding.fixedCurrencySelector.onItemSelectedListener = onNewCurrencySelectedListener
+        binding.variableCurrencySelector.onItemSelectedListener = onNewCurrencySelectedListener
+    }
+
+    private val onNewCurrencySelectedListener = object : AdapterView.OnItemSelectedListener {
+        var fixedCurrency: String = ""
+        var variableCurrency: String = ""
+        override fun onNothingSelected(adapterView: AdapterView<*>?) = adapterView?.setSelection(0) ?: Unit
+        override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            val selectedCurrency = adapterView?.getItemAtPosition(position) as? String
+            when {
+                adapterView === binding.fixedCurrencySelector -> fixedCurrency = selectedCurrency ?: ""
+                adapterView === binding.variableCurrencySelector -> variableCurrency = selectedCurrency ?: ""
+            }
+            selectedCurrency?.let { notifyViewModelOfSelectedCurrencies(fixedCurrency, variableCurrency) }
+        }
+    }
+
+    private fun notifyViewModelOfSelectedCurrencies(fixedCurrency: String, variableCurrency: String) {
+        if (fixedCurrency.isNotEmpty() && variableCurrency.isNotEmpty()) {
+            CoroutineScope(Dispatchers.IO).launch {
+                viewModel.refreshExchangeRates(fixedCurrency, variableCurrency)
+            }
+        }
     }
 
 }

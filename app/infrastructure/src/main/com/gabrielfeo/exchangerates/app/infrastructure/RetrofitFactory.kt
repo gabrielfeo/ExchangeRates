@@ -10,8 +10,9 @@ import retrofit2.converter.jackson.JacksonConverterFactory
 
 class RetrofitFactory {
 
-    fun createRetrofit(logging: Boolean): Retrofit {
+    fun createRetrofit(baseUrl: String, logging: Boolean): Retrofit {
         return Retrofit.Builder()
+            .baseUrl(baseUrl)
             .client(createOkHttpClient(logging))
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .addConverterFactory(createJacksonConverterFactory())
