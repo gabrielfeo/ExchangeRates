@@ -66,7 +66,7 @@ class ExchangeRatesActivity : AppCompatActivity() {
 
     private fun setupExchangeRateChart() {
         binding.exchangeRateChart.apply {
-            setNoDataTextColor(getColor(R.color.primaryTextColor))
+            setNoDataTextColor(getColor(R.color.secondaryTextColor))
             setNoDataText(getString(R.string.exchange_rates_no_rates_message))
         }
         viewModel.exchangeRate.observe(this, Observer { timesAndRates ->
