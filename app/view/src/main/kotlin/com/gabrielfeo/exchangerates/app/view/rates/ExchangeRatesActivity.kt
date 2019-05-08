@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -13,6 +14,8 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.get
 import com.gabrielfeo.exchangerates.app.view.R
 import com.gabrielfeo.exchangerates.app.view.databinding.ExchangeRatesActivityBinding
+import com.gabrielfeo.exchangerates.app.view.rates.ExchangeRatesViewModel.Error
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,6 +33,7 @@ class ExchangeRatesActivity : AppCompatActivity() {
         setupVariableCurrencySelector()
         setupExchangeRateChart()
         observeNewCurrenciesSelection()
+        observeErrors()
     }
 
     private fun setupFixedCurrencySelector() {
@@ -86,6 +90,19 @@ class ExchangeRatesActivity : AppCompatActivity() {
                 viewModel.refreshExchangeRates(fixedCurrency, variableCurrency)
             }
         }
+    }
+
+    private fun observeErrors() {
+        viewModel.errors.observe(this, Observer { error ->
+            when (error) {
+                Error.EXCHANGE_RATES -> showError(R.string.exchange_rates_error_message)
+                else -> showError(R.string.generic_error_message)
+            }
+        })
+    }
+
+    private fun showError(@StringRes messageId: Int) {
+        Snackbar.make(binding.root, getString(messageId), Snackbar.LENGTH_SHORT).show()
     }
 
 }

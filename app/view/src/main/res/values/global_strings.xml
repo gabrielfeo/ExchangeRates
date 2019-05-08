@@ -2,5 +2,7 @@
 <resources>
 
     <string name="app_name">Exchange Rates</string>
+    <string name="exchange_rates_error_message">Couldn\'t get exchange rates</string>
+    <string name="generic_error_message">An error has occurred</string>
 
 </resources>
