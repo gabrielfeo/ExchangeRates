@@ -15,7 +15,7 @@ buildscript {
 }
 
 // TODO Move to buildSrc
-val minSdkVersion: Int by extra { 23 }
+val minSdkVersion: Int by extra { 26 }
 val targetSdkVersion: Int by extra { 28 }
 val compileSdkVersion: Int by extra { targetSdkVersion }
 
@@ -24,6 +24,7 @@ allprojects {
         google()
         jcenter()
         mavenCentral()
+        maven { url = uri("https://jitpack.io") }
     }
 }
 

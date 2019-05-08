@@ -11,8 +11,6 @@ dependencies {
     implementation(kotlin("reflect", "1.3.30"))
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.1")
 
-    api("org.threeten:threetenbp:1.3.8")
-
     implementation("org.joda:joda-money:1.0.1")
 
     val retrofitVersion = "2.5.0"

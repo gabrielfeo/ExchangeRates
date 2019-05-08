@@ -9,16 +9,17 @@ import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
 import java.math.MathContext
 import java.math.RoundingMode
+import java.time.LocalDateTime
 
 class ExchangeRatesViewModel : ViewModel(), KoinComponent {
 
-    val availableFixedCurrencies: LiveData<Iterable<String>>
+    val availableFixedCurrencies: LiveData<Collection<String>>
         get() = _availableFixedCurrencies
 
-    val availableVariableCurrencies: LiveData<Iterable<String>>
+    val availableVariableCurrencies: LiveData<Collection<String>>
         get() = _availableFixedCurrencies
 
-    val exchangeRate: LiveData<String>
+    val exchangeRate: LiveData<Map<LocalDateTime, String>>
         get() = _exchangeRate
 
     suspend fun refreshExchangeRates(fixedCurrencyCode: String, variableCurrencyCode: String) {
@@ -27,7 +28,7 @@ class ExchangeRatesViewModel : ViewModel(), KoinComponent {
         if (fixedCurrency != null && variableCurrency != null) {
             val rate = exchangeRatesRepository.getRate(fixedCurrency, variableCurrency)
             val roundedRateValue = rate.value.round(MathContext(3, RoundingMode.HALF_UP))
-            _exchangeRate.postValue(roundedRateValue.toString())
+            _exchangeRate.postValue(mapOf(rate.time to roundedRateValue.toString()))
         }
     }
 
@@ -35,9 +36,9 @@ class ExchangeRatesViewModel : ViewModel(), KoinComponent {
     private val currencyUnitRepository by inject<CurrencyUnitRepository>()
     private val exchangeRatesRepository by inject<ExchangeRateRepository>()
 
-    private val _availableFixedCurrencies = MutableLiveData<Iterable<String>>()
-    private val _availableVariableCurrencies = MutableLiveData<Iterable<String>>()
-    private val _exchangeRate = MutableLiveData<String>()
+    private val _availableFixedCurrencies = MutableLiveData<Collection<String>>()
+    private val _availableVariableCurrencies = MutableLiveData<Collection<String>>()
+    private val _exchangeRate = MutableLiveData<Map<LocalDateTime, String>>()
 
     init {
         setAvailableFixedCurrencies()

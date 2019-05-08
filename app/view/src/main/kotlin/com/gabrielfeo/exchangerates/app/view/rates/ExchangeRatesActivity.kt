@@ -3,6 +3,7 @@
 package com.gabrielfeo.exchangerates.app.view.rates
 
 import android.os.Bundle
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -20,11 +21,38 @@ class ExchangeRatesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get<ExchangeRatesViewModel>()
         binding = DataBindingUtil.setContentView(this, R.layout.exchange_rates_activity)
-        observeViewModelData()
+        setupFixedCurrencySelector()
+        setupVariableCurrencySelector()
+        setupExchangeRateChart()
     }
 
-    private fun observeViewModelData() {
-        viewModel.availableFixedCurrencies.observe(this, Observer { rate -> binding.placeholder.text = rate.first() })
+    private fun setupFixedCurrencySelector() {
+        val currencyAdapter = createDefaultCurrencyAdapter()
+        binding.fixedCurrencySelector.adapter = currencyAdapter
+        viewModel.availableFixedCurrencies.observe(this, Observer { currencies ->
+            currencyAdapter.clear()
+            currencyAdapter.addAll(currencies)
+        })
+    }
+
+    private fun setupVariableCurrencySelector() {
+        val currencyAdapter = createDefaultCurrencyAdapter()
+        binding.variableCurrencySelector.adapter = currencyAdapter
+        viewModel.availableVariableCurrencies.observe(this, Observer { currencies ->
+            currencyAdapter.clear()
+            currencyAdapter.addAll(currencies)
+        })
+    }
+
+    private fun createDefaultCurrencyAdapter(): ArrayAdapter<String> {
+        return ArrayAdapter<String>(this, android.R.layout.simple_spinner_item).apply {
+            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        }
+    }
+
+    private fun setupExchangeRateChart() {
+        viewModel.exchangeRate.observe(this, Observer { rate ->
+        })
     }
 
 }

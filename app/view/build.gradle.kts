@@ -65,6 +65,8 @@ dependencies {
 
     implementation("com.google.android.material:material:1.0.0")
 
+    implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
+
     val lifecycleComponentsVersion = "2.0.0"
     implementation("androidx.lifecycle:lifecycle-runtime:$lifecycleComponentsVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleComponentsVersion")
