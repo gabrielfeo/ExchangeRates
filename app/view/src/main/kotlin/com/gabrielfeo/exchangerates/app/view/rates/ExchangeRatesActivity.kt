@@ -15,6 +15,9 @@ import androidx.lifecycle.get
 import com.gabrielfeo.exchangerates.app.view.R
 import com.gabrielfeo.exchangerates.app.view.databinding.ExchangeRatesActivityBinding
 import com.gabrielfeo.exchangerates.app.view.rates.ExchangeRatesViewModel.Error
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -62,7 +65,14 @@ class ExchangeRatesActivity : AppCompatActivity() {
     }
 
     private fun setupExchangeRateChart() {
-        viewModel.exchangeRate.observe(this, Observer { rate ->
+        binding.exchangeRateChart.apply {
+            setNoDataTextColor(getColor(R.color.primaryTextColor))
+            setNoDataText(getString(R.string.exchange_rates_no_rates_message))
+        }
+        viewModel.exchangeRate.observe(this, Observer { timesAndRates ->
+            val chartEntries = timesAndRates.map { (timestamp, rate) -> Entry(timestamp, rate) }
+            val chartData = LineData(LineDataSet(chartEntries, "Exchange rates"))
+            binding.exchangeRateChart.data = chartData
         })
     }
 

@@ -11,7 +11,7 @@ import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
 import java.math.MathContext
 import java.math.RoundingMode
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 
 class ExchangeRatesViewModel : ViewModel(), KoinComponent {
 
@@ -21,7 +21,10 @@ class ExchangeRatesViewModel : ViewModel(), KoinComponent {
     val availableVariableCurrencies: LiveData<Collection<String>>
         get() = _availableVariableCurrencies
 
-    val exchangeRate: LiveData<Map<LocalDateTime, String>>
+    /**
+     * Map of timestamps to exchange rate values (i.e. x and y), for building a chart.
+     */
+    val exchangeRate: LiveData<Map<Float, Float>>
         get() = _exchangeRate
 
     enum class Error {
@@ -33,9 +36,9 @@ class ExchangeRatesViewModel : ViewModel(), KoinComponent {
 
     suspend fun refreshExchangeRates(fixedCurrencyCode: String, variableCurrencyCode: String) {
         try {
-            val rate = requestExchangeRatesFromRepository(fixedCurrencyCode, variableCurrencyCode)
-            val roundedRateValue = rate.value.round(MathContext(3, RoundingMode.HALF_UP))
-            _exchangeRate.postValue(mapOf(rate.time to roundedRateValue.toString()))
+            val exchangeRates = requestExchangeRatesFromRepository(fixedCurrencyCode, variableCurrencyCode)
+            val chartEntries = formatAsChartEntries(exchangeRates)
+            _exchangeRate.postValue(chartEntries)
         } catch (error: Throwable) {
             Log.e(TAG, "Couldn't refresh exchange rates.", error)
             _errors.postValue(Error.EXCHANGE_RATES)
@@ -53,13 +56,22 @@ class ExchangeRatesViewModel : ViewModel(), KoinComponent {
         else throw IllegalArgumentException("One or both currencies were null.")
     }
 
+    private fun formatAsChartEntries(rate: ExchangeRate): Map<Float, Float> {
+        val zoneOffset = OffsetDateTime.now().offset
+        val timestamp = rate.time.toEpochSecond(zoneOffset).toFloat()
+        val roundedRateValue = rate.value.round(MathContext(3, RoundingMode.HALF_UP))
+        val rateAsFloat = roundedRateValue.toFloat()
+        return mapOf(timestamp to rateAsFloat)
+    }
+
+
 
     private val currencyUnitRepository by inject<CurrencyUnitRepository>()
     private val exchangeRatesRepository by inject<ExchangeRateRepository>()
 
     private val _availableFixedCurrencies = MutableLiveData<Collection<String>>()
     private val _availableVariableCurrencies = MutableLiveData<Collection<String>>()
-    private val _exchangeRate = MutableLiveData<Map<LocalDateTime, String>>()
+    private val _exchangeRate = MutableLiveData<Map<Float, Float>>()
     private val _errors = MutableLiveData<Error>()
 
     init {
