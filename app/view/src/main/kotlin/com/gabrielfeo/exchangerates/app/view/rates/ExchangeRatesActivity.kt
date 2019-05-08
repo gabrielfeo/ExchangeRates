@@ -34,6 +34,7 @@ class ExchangeRatesActivity : AppCompatActivity() {
         setupExchangeRateChart()
         observeNewCurrenciesSelection()
         observeErrors()
+        observeSwipeToRefresh()
     }
 
     private fun setupFixedCurrencySelector() {
@@ -73,6 +74,7 @@ class ExchangeRatesActivity : AppCompatActivity() {
     private val onNewCurrencySelectedListener = object : AdapterView.OnItemSelectedListener {
         var fixedCurrency: String = ""
         var variableCurrency: String = ""
+        fun refreshSelection() = notifyViewModelOfSelectedCurrencies(fixedCurrency, variableCurrency)
         override fun onNothingSelected(adapterView: AdapterView<*>?) = adapterView?.setSelection(0) ?: Unit
         override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, position: Int, id: Long) {
             val selectedCurrency = adapterView?.getItemAtPosition(position) as? String
@@ -80,7 +82,7 @@ class ExchangeRatesActivity : AppCompatActivity() {
                 adapterView === binding.fixedCurrencySelector -> fixedCurrency = selectedCurrency ?: ""
                 adapterView === binding.variableCurrencySelector -> variableCurrency = selectedCurrency ?: ""
             }
-            selectedCurrency?.let { notifyViewModelOfSelectedCurrencies(fixedCurrency, variableCurrency) }
+            refreshSelection()
         }
     }
 
@@ -103,6 +105,17 @@ class ExchangeRatesActivity : AppCompatActivity() {
 
     private fun showError(@StringRes messageId: Int) {
         Snackbar.make(binding.root, getString(messageId), Snackbar.LENGTH_SHORT).show()
+    }
+
+    private fun observeSwipeToRefresh() = with(binding.swipeToRefresh) {
+        setOnRefreshListener { onNewCurrencySelectedListener.refreshSelection() }
+        fun stopRefresh() = let { isRefreshing = false }
+        viewModel.exchangeRate.observe(this@ExchangeRatesActivity, Observer {
+            if (isRefreshing) stopRefresh()
+        })
+        viewModel.errors.observe(this@ExchangeRatesActivity, Observer { error ->
+            if (isRefreshing && error == Error.EXCHANGE_RATES) stopRefresh()
+        })
     }
 
 }
