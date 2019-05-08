@@ -9,11 +9,9 @@ import org.junit.jupiter.api.Test
  */
 class CurrencyUnitTest {
 
-    private val usDollar: CurrencyUnit = CurrencyUnit("United States Dollar", "US$", "USD", 840)
-
     @Test
     fun `Currency is identified by ISO numeric code`() {
-        val fakeUsDollar = CurrencyUnit(usDollar.fullName, usDollar.symbol, usDollar.code, usDollar.numericCode + 1)
+        val fakeUsDollar = CurrencyUnit(usDollar.symbol, usDollar.code, usDollar.numericCode + 1)
         assertFalse(fakeUsDollar == usDollar)
     }
 
