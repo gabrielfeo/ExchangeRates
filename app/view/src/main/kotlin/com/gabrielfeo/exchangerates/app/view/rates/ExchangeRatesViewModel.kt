@@ -19,7 +19,7 @@ class ExchangeRatesViewModel : ViewModel(), KoinComponent {
         get() = _availableFixedCurrencies
 
     val availableVariableCurrencies: LiveData<Collection<String>>
-        get() = _availableFixedCurrencies
+        get() = _availableVariableCurrencies
 
     val exchangeRate: LiveData<Map<LocalDateTime, String>>
         get() = _exchangeRate
