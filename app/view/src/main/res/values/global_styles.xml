@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme" />
+
+    <style name="Theme.ExchangeRates" parent="Theme.AppCompat.Light">
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="android:textColorPrimary">@color/primaryTextColor</item>
+    </style>
+
+</resources>
