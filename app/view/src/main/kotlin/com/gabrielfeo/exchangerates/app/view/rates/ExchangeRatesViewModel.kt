@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import com.gabrielfeo.exchangerates.domain.currency.CurrencyUnitRepository
 import com.gabrielfeo.exchangerates.domain.currency.rate.ExchangeRate
 import com.gabrielfeo.exchangerates.domain.currency.rate.ExchangeRateRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
 import java.math.MathContext
@@ -34,7 +36,10 @@ class ExchangeRatesViewModel : ViewModel(), KoinComponent {
     val errors: LiveData<Error>
         get() = _errors
 
-    suspend fun refreshExchangeRates(fixedCurrencyCode: String, variableCurrencyCode: String) {
+    suspend fun refreshExchangeRates(
+        fixedCurrencyCode: String,
+        variableCurrencyCode: String
+    ) = withContext(Dispatchers.IO) {
         try {
             val exchangeRates = requestExchangeRatesFromRepository(fixedCurrencyCode, variableCurrencyCode)
             val chartEntries = formatAsChartEntries(exchangeRates)
