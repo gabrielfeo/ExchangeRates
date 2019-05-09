@@ -2,7 +2,7 @@
 
 package com.gabrielfeo.exchangerates.app.infrastructure.rates
 
-import com.gabrielfeo.exchangerates.domain.currency.rate.ExchangeRate
+import com.gabrielfeo.exchangerates.app.infrastructure.rates.dto.ExchangeRatesResponse
 import kotlinx.coroutines.Deferred
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -13,13 +13,13 @@ internal interface ExchangeRatesService {
     fun getCurrentRates(
         @Query("fixed") fixedCurrencyCode: String,
         @Query("variable") variableCurrencyCodes: Collection<String>
-    ): Deferred<Collection<ExchangeRate>>
+    ): Deferred<ExchangeRatesResponse>
 
     @GET("api/rates/past")
     fun getPastRates(
         @Query("time") time: String,
         @Query("fixed") fixedCurrencyCode: String,
         @Query("variable") variableCurrencyCodes: Collection<String>
-    ): Deferred<Collection<ExchangeRate>>
+    ): Deferred<ExchangeRatesResponse>
 
 }

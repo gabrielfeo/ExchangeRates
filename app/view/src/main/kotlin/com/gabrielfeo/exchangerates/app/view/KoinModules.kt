@@ -21,8 +21,10 @@ internal val infrastructureModule
         }
 
         module("DomainInfrastructure") {
-            single<ExchangeRateRepository> { CachedExchangeRateRepository(retrofit = get<Retrofit>()) }
             single<CurrencyUnitRepository> { JodaCurrencyUnitRepository() }
+            single<ExchangeRateRepository> {
+                CachedExchangeRateRepository(get<CurrencyUnitRepository>(), get<Retrofit>())
+            }
         }
 
     }
