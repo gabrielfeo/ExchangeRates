@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="exchange_rates_no_rates_message">No data available for the selected currencies</string>
+    <string name="exchange_rates_error_message">Couldn\'t get exchange rates</string>
+
+</resources>

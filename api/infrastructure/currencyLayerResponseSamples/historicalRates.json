@@ -1,0 +1,16 @@
+{
+  "success": true,
+  "terms": "https:\/\/currencylayer.com\/terms",
+  "privacy": "https:\/\/currencylayer.com\/privacy",
+  "historical": true,
+  "date": "2010-05-05",
+  "timestamp": 1273103999,
+  "source": "USD",
+  "quotes": {
+    "USDUSD": 1,
+    "USDAUD": 1.102563,
+    "USDCAD": 1.028492,
+    "USDPLN": 3.119777,
+    "USDMXN": 12.612614
+  }
+}

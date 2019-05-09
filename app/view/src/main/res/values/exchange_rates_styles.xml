@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ExchangeRates" />
+
+    <style name="ExchangeRates.CurrencySelector">
+        <item name="android:spinnerMode">dropdown</item>
+    </style>
+
+</resources>
