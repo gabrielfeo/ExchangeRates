@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="exchange_rates_api_url">http://exchangerates.azurewebsites.net</string>
+    <string name="exchange_rates_api_url">https://gabrielfeo-exchange-rates.appspot.com</string>
 </resources>
