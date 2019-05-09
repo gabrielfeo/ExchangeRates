@@ -2,6 +2,9 @@
 
 package com.gabrielfeo.exchangerates.api.application
 
-fun main(args: Array<String>) {
-    io.ktor.server.netty.EngineMain.main(args)
+import com.gabrielfeo.exchangerates.api.application.rates.rates
+import io.ktor.application.Application
+
+fun Application.main() {
+    rates()
 }
