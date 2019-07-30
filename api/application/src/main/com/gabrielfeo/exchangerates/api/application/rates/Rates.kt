@@ -30,7 +30,7 @@ fun Application.rates(testing: Boolean = false) {
 
     val currencyUnitRepository: CurrencyUnitRepository = JodaCurrencyUnitRepository() // TODO Configure DI
     val exchangeRateRepository: ExchangeRateRepository = RemoteExchangeRateRepository(
-        currencyLayerApiKey = "3cd646e6c4200f7fc0f5ddfd7642620c" // TODO Find a secret manager
+        currencyLayerApiKey = System.getenv("Currency_Layer_Api_Key") // TODO Find a secret manager
     )
 
     install(ContentNegotiation) { jackson() }
