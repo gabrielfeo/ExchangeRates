@@ -25,8 +25,12 @@ android {
     }
 
     compileOptions {
-        setSourceCompatibility(JavaVersion.VERSION_1_8)
-        setTargetCompatibility(JavaVersion.VERSION_1_8)
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
     dataBinding {
@@ -45,7 +49,7 @@ dependencies {
         exclude(group = "org.threeten", module = "threetenbp")
     }
 
-    implementation(kotlin("reflect", "1.3.30"))
+    implementation(kotlin("reflect", "1.3.72"))
 
     implementation("com.jakewharton.threetenabp:threetenabp:1.2.0")
 

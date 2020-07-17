@@ -1,7 +1,7 @@
 val kotlin_version: String by project
 
 plugins {
-    kotlin("jvm") version "1.3.30"
+    kotlin("jvm") version "1.3.72"
 }
 
 group = "exchangerates"

@@ -13,8 +13,8 @@ configure<JavaPluginConvention> {
 dependencies {
     api(project(":domain"))
 
-    implementation(kotlin("reflect", "1.3.30"))
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.2.1")
+    implementation(kotlin("reflect"))
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.7")
 
     implementation("org.joda:joda-money:1.0.1")
 

@@ -1,7 +1,7 @@
-val kotlinVersion: String by extra { "1.3.30" }
+val kotlinVersion: String by extra { "1.3.72" }
 buildscript {
     // The buildscript block executes first, so there must a declaration in scope
-    val kotlinVersion: String by extra { "1.3.30" }
+    val kotlinVersion: String by extra { "1.3.72" }
 
     repositories {
         google()
@@ -9,7 +9,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:3.4.0")
+        classpath("com.android.tools.build:gradle:4.0.0")
         classpath(kotlin("gradle-plugin", kotlinVersion))
     }
 }
