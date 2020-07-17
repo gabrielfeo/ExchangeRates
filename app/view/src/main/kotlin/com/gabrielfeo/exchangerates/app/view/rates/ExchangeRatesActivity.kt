@@ -3,59 +3,108 @@
 package com.gabrielfeo.exchangerates.app.view.rates
 
 import android.os.Bundle
-import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import androidx.annotation.StringRes
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
-import androidx.lifecycle.get
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.observe
 import com.gabrielfeo.exchangerates.app.view.R
 import com.gabrielfeo.exchangerates.app.view.databinding.ExchangeRatesActivityBinding
-import com.gabrielfeo.exchangerates.app.view.rates.ExchangeRatesViewModel.Error
+import com.gabrielfeo.exchangerates.app.view.rates.ExchangeRatesViewModel.*
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import reactivecircus.flowbinding.android.widget.itemSelections
+import reactivecircus.flowbinding.swiperefreshlayout.refreshes
 
 class ExchangeRatesActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: ExchangeRatesViewModel
+    private val viewModel: ExchangeRatesViewModel by viewModel()
     private lateinit var binding: ExchangeRatesActivityBinding
+
+    private val fixedCurrencyAdapter by lazy { createDefaultCurrencyAdapter() }
+    private val variableCurrencyAdapter by lazy { createDefaultCurrencyAdapter() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get<ExchangeRatesViewModel>()
         binding = DataBindingUtil.setContentView(this, R.layout.exchange_rates_activity)
-        setupFixedCurrencySelector()
-        setupVariableCurrencySelector()
         setupExchangeRateChart()
-        observeNewCurrenciesSelection()
-        observeErrors()
-        observeSwipeToRefresh()
+        viewModel.getState(getEvents())
+            .asLiveData()
+            .observe(owner = this, onChanged = ::setState)
     }
 
-    private fun setupFixedCurrencySelector() {
-        val currencyAdapter = createDefaultCurrencyAdapter()
-        binding.fixedCurrencySelector.adapter = currencyAdapter
-        viewModel.availableFixedCurrencies.observe(this, Observer { currencies ->
-            currencyAdapter.clear()
-            currencyAdapter.addAll(currencies)
-        })
+    private fun setState(state: State) {
+        when (state.selectorState) {
+            CurrencySelectorState.Loading -> { /* TODO Loading view */ }
+            CurrencySelectorState.Error -> showGenericError()
+            is CurrencySelectorState.Loaded -> with(state.selectorState) {
+                fixedCurrencyAdapter.setCurrencies(fixedCurrencies)
+                variableCurrencyAdapter.setCurrencies(variableCurrencies)
+                binding.apply {
+                    ensureAdaptersSet()
+                    fixedCurrencySelector.setSelection(selectedFixedCurrencyIndex)
+                    variableCurrencySelector.setSelection(selectedVariableCurrencyIndex)
+                }
+            }
+        }
+        binding.swipeToRefresh.isRefreshing = state.chartState is ChartState.Refreshing
+        when (state.chartState) {
+            ChartState.Loading -> { /* TODO Loading view */ }
+            ChartState.Refreshing -> { /* Handled above */ }
+            ChartState.Error -> showGenericError()
+            is ChartState.ShowingChart -> {
+                val dataPoints = state.chartState.dataPoints
+                val chartEntries = dataPoints.map { (x, y) -> Entry(x, y) }
+                val chartData = LineData(LineDataSet(chartEntries, "Exchange rates"))
+                binding.exchangeRateChart.data = chartData
+            }
+        }
     }
 
-    private fun setupVariableCurrencySelector() {
-        val currencyAdapter = createDefaultCurrencyAdapter()
-        binding.variableCurrencySelector.adapter = currencyAdapter
-        viewModel.availableVariableCurrencies.observe(this, Observer { currencies ->
-            currencyAdapter.clear()
-            currencyAdapter.addAll(currencies)
-        })
+    private fun getEvents(): Flow<Event> = with(binding) {
+        merge(
+            fixedCurrencySelector.currencySelections(),
+            variableCurrencySelector.currencySelections(),
+            swipeToRefresh.refreshes().map { Event.Refresh(parseCurrentSelection()) }
+        )
+    }
+
+
+    private fun ArrayAdapter<String>.setCurrencies(currencies: List<String>) {
+        clear()
+        addAll(currencies)
+    }
+
+    private fun AdapterView<*>.currencySelections(): Flow<Event.ChangeCurrencies> = itemSelections()
+        .map { position -> getItemAtPosition(position) as String }
+        .map { changedCurrency ->
+            val newSelection = parseNewSelection(this, changedCurrency)
+            Event.ChangeCurrencies(newSelection)
+        }
+
+    private fun parseNewSelection(
+        changedSelector: AdapterView<*>,
+        changedCurrency: String
+    ): CurrencyCodeSelection = with(binding) parse@{
+        if (changedSelector == fixedCurrencySelector) {
+            val otherCurrency = variableCurrencySelector.selectedItem as String
+            CurrencyCodeSelection(fixed = changedCurrency, variable = otherCurrency)
+        } else {
+            val otherCurrency = fixedCurrencySelector.selectedItem as String
+            CurrencyCodeSelection(fixed = otherCurrency, variable = changedCurrency)
+        }
+    }
+
+    private fun parseCurrentSelection(): CurrencyCodeSelection = with(binding) parse@{
+        val variable = variableCurrencySelector.selectedItem as String
+        val fixed = fixedCurrencySelector.selectedItem as String
+        return@parse CurrencyCodeSelection(fixed, variable)
     }
 
     private fun createDefaultCurrencyAdapter(): ArrayAdapter<String> {
@@ -69,63 +118,23 @@ class ExchangeRatesActivity : AppCompatActivity() {
             setNoDataTextColor(getColor(R.color.secondaryTextColor))
             setNoDataText(getString(R.string.exchange_rates_no_rates_message))
         }
-        viewModel.exchangeRate.observe(this, Observer { timesAndRates ->
-            val chartEntries = timesAndRates.map { (timestamp, rate) -> Entry(timestamp, rate) }
-            val chartData = LineData(LineDataSet(chartEntries, "Exchange rates"))
-            binding.exchangeRateChart.data = chartData
-        })
     }
 
-    private fun observeNewCurrenciesSelection() {
-        binding.fixedCurrencySelector.onItemSelectedListener = onNewCurrencySelectedListener
-        binding.variableCurrencySelector.onItemSelectedListener = onNewCurrencySelectedListener
+    private fun showGenericError() {
+        val message = getString(R.string.exchange_rates_error_message)
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
     }
 
-    private val onNewCurrencySelectedListener = object : AdapterView.OnItemSelectedListener {
-        var fixedCurrency: String = ""
-        var variableCurrency: String = ""
-        fun refreshSelection() = notifyViewModelOfSelectedCurrencies(fixedCurrency, variableCurrency)
-        override fun onNothingSelected(adapterView: AdapterView<*>?) = adapterView?.setSelection(0) ?: Unit
-        override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, position: Int, id: Long) {
-            val selectedCurrency = adapterView?.getItemAtPosition(position) as? String
-            when {
-                adapterView === binding.fixedCurrencySelector -> fixedCurrency = selectedCurrency ?: ""
-                adapterView === binding.variableCurrencySelector -> variableCurrency = selectedCurrency ?: ""
-            }
-            refreshSelection()
+    /**
+     * Ensures the lazy adapter are set to their respective views.
+     */
+    private fun ExchangeRatesActivityBinding.ensureAdaptersSet() {
+        fun Spinner.setIfNotSet(adapter: ArrayAdapter<String>) {
+            if (getAdapter() == null)
+                setAdapter(adapter)
         }
-    }
-
-    private fun notifyViewModelOfSelectedCurrencies(fixedCurrency: String, variableCurrency: String) {
-        if (fixedCurrency.isNotEmpty() && variableCurrency.isNotEmpty()) {
-            CoroutineScope(Dispatchers.IO).launch {
-                viewModel.refreshExchangeRates(fixedCurrency, variableCurrency)
-            }
-        }
-    }
-
-    private fun observeErrors() {
-        viewModel.errors.observe(this, Observer { error ->
-            when (error) {
-                Error.EXCHANGE_RATES -> showError(R.string.exchange_rates_error_message)
-                else -> showError(R.string.generic_error_message)
-            }
-        })
-    }
-
-    private fun showError(@StringRes messageId: Int) {
-        Snackbar.make(binding.root, getString(messageId), Snackbar.LENGTH_SHORT).show()
-    }
-
-    private fun observeSwipeToRefresh() = with(binding.swipeToRefresh) {
-        setOnRefreshListener { onNewCurrencySelectedListener.refreshSelection() }
-        fun stopRefresh() = let { isRefreshing = false }
-        viewModel.exchangeRate.observe(this@ExchangeRatesActivity, Observer {
-            if (isRefreshing) stopRefresh()
-        })
-        viewModel.errors.observe(this@ExchangeRatesActivity, Observer { error ->
-            if (isRefreshing && error == Error.EXCHANGE_RATES) stopRefresh()
-        })
+        fixedCurrencySelector.setIfNotSet(fixedCurrencyAdapter)
+        variableCurrencySelector.setIfNotSet(variableCurrencyAdapter)
     }
 
 }

@@ -1,64 +1,106 @@
 package com.gabrielfeo.exchangerates.app.view.rates
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.gabrielfeo.exchangerates.domain.currency.CurrencyUnit
 import com.gabrielfeo.exchangerates.domain.currency.CurrencyUnitRepository
 import com.gabrielfeo.exchangerates.domain.currency.rate.ExchangeRate
 import com.gabrielfeo.exchangerates.domain.currency.rate.ExchangeRateRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import org.koin.standalone.KoinComponent
-import org.koin.standalone.inject
+import kotlinx.coroutines.flow.*
 import java.math.MathContext
 import java.math.RoundingMode
 import java.time.OffsetDateTime
 
-class ExchangeRatesViewModel : ViewModel(), KoinComponent {
+class ExchangeRatesViewModel(
+    private val currencyUnitRepository: CurrencyUnitRepository,
+    private val exchangeRatesRepository: ExchangeRateRepository
+) : ViewModel() {
 
-    val availableFixedCurrencies: LiveData<Collection<String>>
-        get() = _availableFixedCurrencies
-
-    val availableVariableCurrencies: LiveData<Collection<String>>
-        get() = _availableVariableCurrencies
-
-    /**
-     * Map of timestamps to exchange rate values (i.e. x and y), for building a chart.
-     */
-    val exchangeRate: LiveData<Map<Float, Float>>
-        get() = _exchangeRate
-
-    enum class Error {
-        EXCHANGE_RATES
+    data class State(
+        val selectorState: CurrencySelectorState,
+        val chartState: ChartState
+    )
+    sealed class CurrencySelectorState {
+        object Loading : CurrencySelectorState()
+        object Error : CurrencySelectorState()
+        data class Loaded(
+            val fixedCurrencies: List<String>,
+            val variableCurrencies: List<String>,
+            val selectedFixedCurrencyIndex: Int,
+            val selectedVariableCurrencyIndex: Int
+        ) : CurrencySelectorState()
+    }
+    sealed class ChartState {
+        object Loading : ChartState()
+        object Refreshing : ChartState() // (user-initiated)
+        object Error : ChartState()
+        data class ShowingChart(val dataPoints: Map<Float, Float>) : ChartState()
     }
 
-    val errors: LiveData<Error>
-        get() = _errors
+    sealed class Event {
+        data class Refresh(val currentSelection: CurrencyCodeSelection) : Event()
+        data class ChangeCurrencies(val newSelection: CurrencyCodeSelection) : Event()
+    }
 
-    suspend fun refreshExchangeRates(
-        fixedCurrencyCode: String,
-        variableCurrencyCode: String
-    ) = withContext(Dispatchers.IO) {
-        try {
-            val exchangeRates = requestExchangeRatesFromRepository(fixedCurrencyCode, variableCurrencyCode)
-            val chartEntries = formatAsChartEntries(exchangeRates)
-            _exchangeRate.postValue(chartEntries)
-        } catch (error: Throwable) {
-            Log.e(TAG, "Couldn't refresh exchange rates.", error)
-            _errors.postValue(Error.EXCHANGE_RATES)
+    data class CurrencyCodeSelection(
+        val fixed: String,
+        val variable: String
+    )
+
+
+    private inline val currentState get() = state.value
+    private val state = MutableStateFlow(State(CurrencySelectorState.Loading, ChartState.Loading))
+
+    fun getState(events: Flow<Event>): Flow<State> =
+        merge(state, events.reduceToState())
+            .catch { emit(currentState.copy(chartState = ChartState.Error)) }
+            .onStart { emit(buildInitialState()) }
+            .onEach { state.value = it }
+            .distinctUntilChanged()
+
+    private fun Flow<Event>.reduceToState(): Flow<State> = transformLatest<Event, State> { event ->
+        val currencySelection = when (event) {
+            is Event.Refresh -> event.currentSelection
+            is Event.ChangeCurrencies -> event.newSelection
         }
+        val newSelectorState = createNewSelectorStateFor(currencySelection)
+        emit(currentState.copy(selectorState = newSelectorState, chartState = ChartState.Loading))
+        val newChartEntries = getChartEntriesFor(currencySelection)
+        emit(currentState.copy(chartState = ChartState.ShowingChart(newChartEntries)))
+    }
+
+    private suspend fun buildInitialState(): State {
+        val fixedCurrencies = getAvailableFixedCurrencies().map { it.code }
+        val variableCurrencies = getAvailableVariableCurrencies().map { it.code }
+        val defaultSelection = CurrencyCodeSelection(fixedCurrencies.first(), variableCurrencies.first())
+        val chartEntries = getChartEntriesFor(defaultSelection)
+        return State(
+            CurrencySelectorState.Loaded(fixedCurrencies, variableCurrencies, 0, 0),
+            ChartState.ShowingChart(chartEntries)
+        )
+    }
+
+    private fun createNewSelectorStateFor(newSelection: CurrencyCodeSelection): CurrencySelectorState {
+        val current = checkNotNull(currentState.selectorState as? CurrencySelectorState.Loaded)
+        return current.copy(
+            selectedFixedCurrencyIndex = current.fixedCurrencies.indexOf(newSelection.fixed),
+            selectedVariableCurrencyIndex = current.variableCurrencies.indexOf(newSelection.variable)
+        )
+    }
+
+
+    private suspend fun getChartEntriesFor(selection: CurrencyCodeSelection): Map<Float, Float> {
+        val (fixed, variable) = selection
+        val exchangeRates = requestExchangeRatesFromRepository(fixed, variable)
+        return formatAsChartEntries(exchangeRates)
     }
 
     private suspend fun requestExchangeRatesFromRepository(
         fixedCurrencyCode: String,
         variableCurrencyCode: String
     ): ExchangeRate {
-        val fixedCurrency = currencyUnitRepository[fixedCurrencyCode]
-        val variableCurrency = currencyUnitRepository[variableCurrencyCode]
-        return if (fixedCurrency != null && variableCurrency != null)
-            exchangeRatesRepository.getRate(fixedCurrency, variableCurrency)
-        else throw IllegalArgumentException("One or both currencies were null.")
+        val fixedCurrency = requireNotNull(currencyUnitRepository[fixedCurrencyCode])
+        val variableCurrency = requireNotNull(currencyUnitRepository[variableCurrencyCode])
+        return exchangeRatesRepository.getRate(fixedCurrency, variableCurrency)
     }
 
     private fun formatAsChartEntries(rate: ExchangeRate): Map<Float, Float> {
@@ -69,34 +111,14 @@ class ExchangeRatesViewModel : ViewModel(), KoinComponent {
         return mapOf(timestamp to rateAsFloat)
     }
 
-
-
-    private val currencyUnitRepository by inject<CurrencyUnitRepository>()
-    private val exchangeRatesRepository by inject<ExchangeRateRepository>()
-
-    private val _availableFixedCurrencies = MutableLiveData<Collection<String>>()
-    private val _availableVariableCurrencies = MutableLiveData<Collection<String>>()
-    private val _exchangeRate = MutableLiveData<Map<Float, Float>>()
-    private val _errors = MutableLiveData<Error>()
-
-    init {
-        setAvailableFixedCurrencies()
-        setAvailableVariableCurrencies()
+    private fun getAvailableFixedCurrencies(): List<CurrencyUnit> {
+        return currencyUnitRepository["USD"]
+            ?.let { listOf(it) } ?: emptyList()
     }
-
-    private fun setAvailableFixedCurrencies() {
-        currencyUnitRepository["USD"]
-            ?.let { usDollar -> _availableFixedCurrencies.postValue(listOf(usDollar.code)) }
-    }
-
-    private fun setAvailableVariableCurrencies() {
-        currencyUnitRepository
-            .currencies
+    private fun getAvailableVariableCurrencies(): List<CurrencyUnit> {
+        return currencyUnitRepository.currencies
             .filterNot { it.code == "USD" }
-            .map { currency -> currency.code }
-            .let { availableCodes -> _availableVariableCurrencies.postValue(availableCodes) }
     }
+
 
 }
-
-private val TAG = ExchangeRatesViewModel::class.simpleName ?: ""

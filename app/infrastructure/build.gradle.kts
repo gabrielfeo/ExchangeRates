@@ -25,7 +25,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:3.14.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
 
-    val koinVersion = "1.0.2"
+    val koinVersion = "2.1.5"
     api("org.koin:koin-core:$koinVersion")
     testImplementation("org.koin:koin-test:$koinVersion")
 

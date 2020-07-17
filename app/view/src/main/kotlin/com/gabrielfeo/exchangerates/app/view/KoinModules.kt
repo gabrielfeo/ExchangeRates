@@ -5,10 +5,12 @@ package com.gabrielfeo.exchangerates.app.view
 import com.gabrielfeo.exchangerates.app.infrastructure.RetrofitFactory
 import com.gabrielfeo.exchangerates.app.infrastructure.currency.JodaCurrencyUnitRepository
 import com.gabrielfeo.exchangerates.app.infrastructure.rates.CachedExchangeRateRepository
+import com.gabrielfeo.exchangerates.app.view.rates.ExchangeRatesViewModel
 import com.gabrielfeo.exchangerates.domain.currency.CurrencyUnitRepository
 import com.gabrielfeo.exchangerates.domain.currency.rate.ExchangeRateRepository
 import org.koin.android.ext.koin.androidApplication
-import org.koin.dsl.module.module
+import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.dsl.module
 import retrofit2.Retrofit
 
 internal val infrastructureModule
@@ -20,11 +22,14 @@ internal val infrastructureModule
             RetrofitFactory().createRetrofit(baseUrl, shouldLog)
         }
 
-        module("DomainInfrastructure") {
-            single<CurrencyUnitRepository> { JodaCurrencyUnitRepository() }
-            single<ExchangeRateRepository> {
-                CachedExchangeRateRepository(get<CurrencyUnitRepository>(), get<Retrofit>())
-            }
+        single<CurrencyUnitRepository> { JodaCurrencyUnitRepository() }
+        single<ExchangeRateRepository> {
+            CachedExchangeRateRepository(get<CurrencyUnitRepository>(), get<Retrofit>())
         }
 
+    }
+
+internal val viewModelModule
+    get() = module {
+        viewModel { ExchangeRatesViewModel(get(), get()) }
     }
