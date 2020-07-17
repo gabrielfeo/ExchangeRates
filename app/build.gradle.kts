@@ -19,7 +19,7 @@ val minSdkVersion: Int by extra { 26 }
 val targetSdkVersion: Int by extra { 28 }
 val compileSdkVersion: Int by extra { targetSdkVersion }
 
-allprojects {
+subprojects {
     repositories {
         google()
         jcenter()
