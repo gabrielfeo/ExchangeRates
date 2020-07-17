@@ -25,8 +25,12 @@ android {
     }
 
     compileOptions {
-        setSourceCompatibility(JavaVersion.VERSION_1_8)
-        setTargetCompatibility(JavaVersion.VERSION_1_8)
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
     dataBinding {
@@ -45,7 +49,7 @@ dependencies {
         exclude(group = "org.threeten", module = "threetenbp")
     }
 
-    implementation(kotlin("reflect", "1.3.30"))
+    implementation(kotlin("reflect", "1.3.72"))
 
     implementation("com.jakewharton.threetenabp:threetenabp:1.2.0")
 
@@ -53,10 +57,14 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
     implementation("com.squareup.retrofit2:converter-jackson:$retrofitVersion")
 
-    val koinVersion = "1.0.2"
+    val koinVersion = "2.1.5"
     implementation("org.koin:koin-android:$koinVersion")
     implementation("org.koin:koin-androidx-viewmodel:$koinVersion")
     testImplementation("org.koin:koin-test:$koinVersion")
+
+    val flowBindingsVersion = "1.0.0-alpha02"
+    implementation("io.github.reactivecircus.flowbinding:flowbinding-android:$flowBindingsVersion")
+    implementation("io.github.reactivecircus.flowbinding:flowbinding-swiperefreshlayout:$flowBindingsVersion")
 
 
     implementation("androidx.core:core-ktx:1.0.1")
@@ -67,10 +75,11 @@ dependencies {
 
     implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
 
-    val lifecycleComponentsVersion = "2.0.0"
+    val lifecycleComponentsVersion = "2.2.0"
     implementation("androidx.lifecycle:lifecycle-runtime:$lifecycleComponentsVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleComponentsVersion")
     implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleComponentsVersion")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleComponentsVersion")
     kapt("androidx.lifecycle:lifecycle-compiler:$lifecycleComponentsVersion")
 
     testImplementation("androidx.test:runner:1.1.1")
